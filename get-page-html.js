@@ -18,10 +18,12 @@ const CDP = require('chrome-remote-interface');
 
 // Wait for window.onload before doing stuff.
     Page.loadEventFired(async () => {
-        const js = "document.querySelector('title').textContent";
+        // const js = "document.querySelector('title').textContent";
+        const js = "document.getElementsByTagName('html')[0].innerHTML";
         // Evaluate the JS expression in the page.
         const result = await Runtime.evaluate({expression: js});
 
+        // console.log('Title of page: ' + result.result.value);
         console.log('Source of page: ' + result.result.value);
 
         protocol.close();
