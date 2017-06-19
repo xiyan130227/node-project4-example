@@ -18,14 +18,42 @@ async function execJs() {
 
 // Wait for window.onload before doing stuff.
     Page.loadEventFired(async () => {
-        // const js = "document.querySelector('title').textContent";
-        const js = "document.getElementsByTagName('html')[0].outerHTML";
+        const js = "document.querySelector('title').textContent";
 
         // Evaluate the JS expression in the page.
         const result = await Runtime.evaluate({expression: js});
 
-        // console.log('Title of page: ' + result.result.value);
-        console.log('Source of page: ' + result.result.value);
+        console.log('Title of page: ' + result.result.value);
+
+        protocol.close();
+        chrome.kill(); // Kill Chrome.
+    });
+}
+
+async function checkManifest() {
+
+    const chrome = await launchChrome();
+    const protocol = await CDP({port: chrome.port});
+
+// Extract the DevTools protocol domains we need and enable them.
+// See API docs: https://chromedevtools.github.io/devtools-protocol/
+    const {Page} = protocol;
+    await Page.enable();
+
+    Page.navigate({url: 'https://www.baidu.com/'});
+
+// Wait for window.onload before doing stuff.
+    Page.loadEventFired(async () => {
+        const manifest = await Page.getAppManifest();
+
+        if (manifest.url) {
+            console.log('yes')
+            console.log('Manifest: ' + manifest.url);
+            console.log(manifest.data);
+        } else {
+            console.log('no')
+            console.log('Site has no app manifest');
+        }
 
         protocol.close();
         chrome.kill(); // Kill Chrome.
@@ -51,8 +79,7 @@ async function launchChrome(headless = true) {
 }
 
 launchChrome(true)
-    .then(chrome => {
-    })
+// .then(chrome => {})
     .then(execJs)
 // .then(getScreenShot);
 
