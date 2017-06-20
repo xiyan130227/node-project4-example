@@ -35,7 +35,7 @@ async function execJs() {
 
                 fs.appendFile('./result.txt', result.result.value+"\r\n", {flag: 'a'}, function (err) {
                    if(err) {console.error(err);} else {console.log('写入成功');}
-                //    Runtime.evaluate({expression: 'document.getElementById("sogou_next").click()'})
+                   Runtime.evaluate({expression: 'document.getElementById("sogou_next").click()'})
                 });
             }))
         }
