@@ -3,7 +3,7 @@
  */
 const axios = require('axios');
 
-axios.get('http://weixin.sogou.com/antispider/util/seccode.php')
+axios.get('http://upload.chaojiying.net/Upload/Processing.php')
     .then(function (response) {
         console.log(response);
     })
