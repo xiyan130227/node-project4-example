@@ -17,8 +17,8 @@ rest.post('http://upload.chaojiying.net/Upload/Processing.php', {
         'userfile': rest.file(filename, null, fs.statSync(filename).size, null, 'image/jpg') // filename: 抓取回来的码证码文件
     },
     headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36',
+        'Content-Type': 'text/html;charset=utf-8'
     }
 }).on('complete', function (data) {
     var captcha = JSON.parse(data);

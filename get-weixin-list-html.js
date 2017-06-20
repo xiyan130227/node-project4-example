@@ -50,14 +50,17 @@ async function execJs() {
         if ((!hasClick) && hasSearch) {
             console.log('click', hasSearch, hasClick)
             hasClick=true;
-            Runtime.evaluate({expression: 'document.getElementsByClassName("time-range")[1].click()'})
+            //搜索"一天内"
+            // Runtime.evaluate({expression: 'document.getElementsByClassName("time-range")[1].click()'})
+            //搜索当日微信数据
+            Runtime.evaluate({expression: 'document.getElementById(\'time_enter\').click()'})
         }
 
         if (!hasSearch){
             console.log('search', hasSearch, hasClick)
             const js = [
                 'var input = document.querySelector(\'#query\')',
-                'input.value=\'杨静\'',
+                'input.value=\'固原\'',
                 'document.getElementsByClassName("swz")[0].click()'
             ].join(';')
             hasSearch = true;
