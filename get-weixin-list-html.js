@@ -12,9 +12,11 @@ async function launchChrome(headless = true) {
     });
 }
 
+let chrome, protocol
+
 async function execJs() {
-    let chrome = await launchChrome();
-    let protocol = await CDP({port: chrome.port});
+    chrome = await launchChrome();
+    protocol = await CDP({port: chrome.port});
     const {Page, Runtime} = protocol;
     await Promise.all([Page.enable(), Runtime.enable()]);
 
@@ -42,6 +44,7 @@ async function execJs() {
                     Runtime.evaluate({expression: 'document.getElementById("sogou_next").click()'})
                 });
             }))
+            protocol.close()
         }
 
         if ((!hasClick) && hasSearch) {
