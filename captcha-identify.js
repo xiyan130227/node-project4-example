@@ -2,6 +2,7 @@
  * Created by yangjing on 6/20/17.
  */
 const axios = require('axios');
+const {captchaInfo} =require("./config.js")
 
 // axios.get('http://weixin.sogou.com/antispider/util/seccode.php')
 let captcha_base64
@@ -23,21 +24,14 @@ http.get(url, res => {
         const base64_img = data.toString('base64');
         captcha_base64 = 'data:image/jpg;base64,' + base64_img
         console.log(captcha_base64);
-
-        axios.post('http://upload.chaojiying.net/Upload/Processing.php', {
-            'user': 'zhongyicrawler',
-            'pass': 'zhongyicrawler',
-            'softid': '892937',
-            'codetype': '1006',
-            'file_base64': captcha_base64
-        }).then(response => {
+        console.log(captchaInfo)
+        captchaInfo[file_base64]=base64_img
+        axios.post('http://upload.chaojiying.net/Upload/Processing.php', captchaInfo).then(response => {
             console.log(666666)
-            console.log(response);
+            console.log(response.data);
         }).catch(function (error) {
             console.log(7777777)
             console.log(error);
         });
     });
 });
-
-
