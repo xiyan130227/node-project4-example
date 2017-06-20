@@ -3,6 +3,7 @@
  */
 const chromeLauncher = require('lighthouse/chrome-launcher/chrome-launcher');
 const CDP = require('chrome-remote-interface');
+var fs = require('fs');
 
 async function launchChrome(headless = true) {
     return await chromeLauncher.launch({
@@ -10,8 +11,6 @@ async function launchChrome(headless = true) {
         chromeFlags: ['--window-size=412,732','--disable-gpu',headless ? '--headless' : '']
     });
 }
-
-
 
 async function execJs() {
     let chrome = await launchChrome();
@@ -23,6 +22,8 @@ async function execJs() {
 
     let hasSearch=false,hasClick=false;
 
+    // let resultPages=[]
+
     await Page.loadEventFired(() => {
         console.log('onLoad!!!')
         if(hasClick&&hasSearch){
@@ -30,8 +31,12 @@ async function execJs() {
             new Promise(resolve=>{
                 resolve(Runtime.evaluate({expression: 'document.getElementsByTagName(\'html\')[0].outerHTML'}))
             }).then((result=>{
-                console.log(result.result.value)
-                // protocol.close()
+                // resultPages.push(result.result.value)
+
+                fs.appendFile('./result.txt', result.result.value+"\r\n", {flag: 'a'}, function (err) {
+                   if(err) {console.error(err);} else {console.log('写入成功');}
+                //    Runtime.evaluate({expression: 'document.getElementById("sogou_next").click()'})
+                });
             }))
         }
 
