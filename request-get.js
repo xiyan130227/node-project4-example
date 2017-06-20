@@ -4,9 +4,9 @@
 const axios = require('axios');
 
 axios.get('http://weixin.sogou.com/antispider/util/seccode.php')
-    .then(response => {
-        console.log(JSON.parse(response).data)
+    .then(function (response) {
+        console.log(response);
     })
-    .catch(error => {
+    .catch(function (error) {
         console.log(error);
     });

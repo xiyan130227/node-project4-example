@@ -8,7 +8,7 @@ var fs = require('fs');
 async function launchChrome(headless = true) {
     return await chromeLauncher.launch({
         port: 9222,
-        chromeFlags: ['--window-size=412,732','--disable-gpu',headless ? '--headless' : '']
+        chromeFlags: ['--window-size=412,732', '--disable-gpu', headless ? '--headless' : '']
     });
 }
 
@@ -22,41 +22,45 @@ async function execJs() {
 
     Page.navigate({url: 'http://weixin.sogou.com/'});
 
-    let hasSearch=false,hasClick=false;
+    let hasSearch = false, hasClick = false;
 
     // let resultPages=[]
 
     await Page.loadEventFired(() => {
         console.log('onLoad!!!')
-        if(hasClick&&hasSearch){
-            console.log('result',hasSearch,hasClick)
-            new Promise(resolve=>{
+        if (hasClick && hasSearch) {
+            console.log('result', hasSearch, hasClick)
+            new Promise(resolve => {
                 resolve(Runtime.evaluate({expression: 'document.getElementsByTagName(\'html\')[0].outerHTML'}))
-            }).then((result=>{
+            }).then((result => {
                 // resultPages.push(result.result.value)
-
                 fs.appendFile('./result.txt', result.result.value + "\r\n", {flag: 'a'}, function (err) {
                     if (err) {
                         console.error(err);
                     } else {
                         console.log('写入成功');
                     }
-                    Runtime.evaluate({expression: 'document.getElementById("sogou_next").click()'})
+                    new Promise(resolve => {
+                        resolve(Runtime.evaluate({expression: 'document.getElementById("sogou_next").click()'}))
+                    }).then(data => {
+                        const result = data.result.value
+                        if (result.indexOf('TypeError') > -1)
+                            console.error(result)
+                    })
                 });
             }))
-            protocol.close()
         }
 
         if ((!hasClick) && hasSearch) {
             console.log('click', hasSearch, hasClick)
-            hasClick=true;
+            hasClick = true;
             //搜索"一天内"
             // Runtime.evaluate({expression: 'document.getElementsByClassName("time-range")[1].click()'})
             //搜索当日微信数据
             Runtime.evaluate({expression: 'document.getElementById(\'time_enter\').click()'})
         }
 
-        if (!hasSearch){
+        if (!hasSearch) {
             console.log('search', hasSearch, hasClick)
             const js = [
                 'var input = document.querySelector(\'#query\')',
