@@ -12,9 +12,20 @@ async function launchChrome(headless = true) {
     });
 }
 
+<<<<<<<
+Updated
+upstream
+=== === =
+    let
+chrome
+let protocol
+
+>>>>>>>
+Stashed
+changes
 async function execJs() {
-    let chrome = await launchChrome();
-    let protocol = await CDP({port: chrome.port});
+    chrome = await launchChrome();
+    protocol = await CDP({port: chrome.port});
     const {Page, Runtime} = protocol;
     await Promise.all([Page.enable(), Runtime.enable()]);
 
@@ -31,12 +42,25 @@ async function execJs() {
             new Promise(resolve=>{
                 resolve(Runtime.evaluate({expression: 'document.getElementsByTagName(\'html\')[0].outerHTML'}))
             }).then((result=>{
+                <<<<<<<
+                Updated
+                upstream
                 // resultPages.push(result.result.value)
 
-                fs.appendFile('./result.txt', result.result.value+"\r\n", {flag: 'a'}, function (err) {
-                   if(err) {console.error(err);} else {console.log('写入成功');}
-                   Runtime.evaluate({expression: 'document.getElementById("sogou_next").click()'})
+                fs.appendFile('./result.txt', result.result.value + "\r\n", {flag: 'a'}, function (err) {
+                    if (err) {
+                        console.error(err);
+                    } else {
+                        console.log('写入成功');
+                    }
+                    Runtime.evaluate({expression: 'document.getElementById("sogou_next").click()'})
                 });
+                ======
+                =
+                console.log(result.result.value)
+                protocol.close()
+                >>> >>> > Stashed
+                changes
             }))
         }
 
@@ -50,7 +74,7 @@ async function execJs() {
             console.log('search',hasSearch,hasClick) 
             const js = [
                 'var input = document.querySelector(\'#query\')',
-                'input.value=\'杨静\'',
+                'input.value=\'固原\'',
                 'document.getElementsByClassName("swz")[0].click()'
             ].join(';')   
             hasSearch=true;        
