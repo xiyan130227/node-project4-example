@@ -12,20 +12,9 @@ async function launchChrome(headless = true) {
     });
 }
 
-<<<<<<<
-Updated
-upstream
-=== === =
-    let
-chrome
-let protocol
-
->>>>>>>
-Stashed
-changes
 async function execJs() {
-    chrome = await launchChrome();
-    protocol = await CDP({port: chrome.port});
+    let chrome = await launchChrome();
+    let protocol = await CDP({port: chrome.port});
     const {Page, Runtime} = protocol;
     await Promise.all([Page.enable(), Runtime.enable()]);
 
@@ -42,9 +31,6 @@ async function execJs() {
             new Promise(resolve=>{
                 resolve(Runtime.evaluate({expression: 'document.getElementsByTagName(\'html\')[0].outerHTML'}))
             }).then((result=>{
-                <<<<<<<
-                Updated
-                upstream
                 // resultPages.push(result.result.value)
 
                 fs.appendFile('./result.txt', result.result.value + "\r\n", {flag: 'a'}, function (err) {
@@ -55,31 +41,25 @@ async function execJs() {
                     }
                     Runtime.evaluate({expression: 'document.getElementById("sogou_next").click()'})
                 });
-                ======
-                =
-                console.log(result.result.value)
-                protocol.close()
-                >>> >>> > Stashed
-                changes
             }))
         }
 
-        if((!hasClick)&&hasSearch){       
-            console.log('click',hasSearch,hasClick)            
+        if ((!hasClick) && hasSearch) {
+            console.log('click', hasSearch, hasClick)
             hasClick=true;
             Runtime.evaluate({expression: 'document.getElementsByClassName("time-range")[1].click()'})
         }
 
         if (!hasSearch){
-            console.log('search',hasSearch,hasClick) 
+            console.log('search', hasSearch, hasClick)
             const js = [
                 'var input = document.querySelector(\'#query\')',
-                'input.value=\'固原\'',
+                'input.value=\'杨静\'',
                 'document.getElementsByClassName("swz")[0].click()'
-            ].join(';')   
-            hasSearch=true;        
+            ].join(';')
+            hasSearch = true;
             Runtime.evaluate({expression: js})
-            
+
         }
     });
 }
