@@ -56,4 +56,4 @@ function reportError(pic_id) {
     })
 }
 
-getCaptchaValue()
+// getCaptchaValue()

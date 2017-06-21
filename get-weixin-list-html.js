@@ -1,17 +1,19 @@
 /**
  * Created by yangjing on 6/17/17.
  */
-const chromeLauncher = require('lighthouse/chrome-launcher/chrome-launcher');
-const CDP = require('chrome-remote-interface');
-let fs = require('fs');
-const program = require('commander');
+const chromeLauncher = require('lighthouse/chrome-launcher/chrome-launcher')
+const CDP = require('chrome-remote-interface')
+let fs = require('fs')
+const program = require('commander')
 const captcha = require("./captcha-identify")
 
 program
     .version('0.0.1')
     .option('-k, --keyword [type]', 'Add wechat searchword')
-    .parse(process.argv);
+    .option('-t, --crawltype [type]', 'Add wechat crawltype')
+    .parse(process.argv)
 // console.log(program.keyword)
+// console.log(program.crawltype)
 
 async function launchChrome(headless = true) {
     return await chromeLauncher.launch({
@@ -62,7 +64,7 @@ let chrome, protocol
                         identifyTimes++
                     })
                 } else if (identifyTimes > 3) {
-                    console.error('Captcha identify times already over 3!!!')
+                    // console.error('Captcha identify times already over 3!!!')
                 } else {
                     //将源码内容放入到数组中
                     listPageHtmls.push(result.result.value)
@@ -76,9 +78,9 @@ let chrome, protocol
                             console.debug('listPageHtmls.length: ' + listPageHtmls.length)
                         }
                     }).catch(err => {
-                        console.error('catch error: ' + err)
+                        // console.error('catch error: ' + err)
                         console.debug('End crawler successfully!')
-                        console.debug('listPageHtmls: ' + listPageHtmls)
+                        console.log(listPageHtmls)
                         protocol.close()
                         chrome.kill()
                     })
