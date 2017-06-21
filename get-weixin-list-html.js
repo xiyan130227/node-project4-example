@@ -7,6 +7,11 @@ let fs = require('fs')
 const program = require('commander')
 const captcha = require("./captcha-identify")
 
+// 配置引入
+const {captchaInfo}=require("./config");
+//使用示例
+console.log(Object.assign({yourConfig:8},captchaInfo))
+
 program
     .version('0.0.1')
     .option('-k, --keyword [type]', 'Add wechat searchword')
@@ -110,4 +115,3 @@ let chrome, protocol
         }
     });
 })()
-
