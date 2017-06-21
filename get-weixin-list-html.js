@@ -8,9 +8,9 @@ const program = require('commander')
 const captcha = require("./captcha-identify")
 
 // 配置引入
-const {captchaInfo}=require("./config");
+const {captchaInfo} = require("./config")
 //使用示例
-console.log(Object.assign({yourConfig:8},captchaInfo))
+console.log(Object.assign({yourConfig: 8}, captchaInfo))
 
 program
     .version('0.0.1')
@@ -99,7 +99,9 @@ let chrome, protocol
             //搜索"一天内"
             // Runtime.evaluate({expression: 'document.getElementsByClassName("time-range")[1].click()'})
             //搜索当日微信数据
-            Runtime.evaluate({expression: 'document.getElementById(\'time_enter\').click()'})
+            if (program.crawltype.indexOf("Increament") > -1) {
+                Runtime.evaluate({expression: 'document.getElementById(\'time_enter\').click()'})
+            }
         }
 
         if (!hasSearch) {
