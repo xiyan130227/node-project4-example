@@ -2,8 +2,7 @@
  * 超级鹰 http 接口(上传)，node.js 示例代码  http://www.chaojiying.com/
  * 注意：需要安装restler : npm install restler
  */
-
-var rest = require('axios');
+const rest = require('axios');
 rest.get('http://weixin.sogou.com/antispider/util/seccode.php').then(img => {
     rest.post('http://upload.chaojiying.net/Upload/Processing.php', {
         data: {

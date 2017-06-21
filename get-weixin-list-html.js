@@ -3,7 +3,15 @@
  */
 const chromeLauncher = require('lighthouse/chrome-launcher/chrome-launcher');
 const CDP = require('chrome-remote-interface');
-var fs = require('fs');
+let fs = require('fs');
+const program = require('commander');
+const captcha = require("./captcha-identify")
+
+program
+    .version('0.0.1')
+    .option('-k, --keyword [type]', 'Add wechat searchword')
+    .parse(process.argv);
+// console.log(program.keyword)
 
 async function launchChrome(headless = true) {
     return await chromeLauncher.launch({
@@ -14,7 +22,7 @@ async function launchChrome(headless = true) {
 
 let chrome, protocol
 
-async function execJs() {
+(async function execJs() {
     chrome = await launchChrome();
     protocol = await CDP({port: chrome.port});
     const {Page, Runtime} = protocol;
@@ -23,36 +31,63 @@ async function execJs() {
     Page.navigate({url: 'http://weixin.sogou.com/'});
 
     let hasSearch = false, hasClick = false;
-
-    // let resultPages=[]
+    let identifyTimes = 0
+    let listPageHtmls = []
+    let picId
 
     await Page.loadEventFired(() => {
-        console.log('onLoad!!!')
+        console.debug('onLoad!!!')
         if (hasClick && hasSearch) {
-            console.log('result', hasSearch, hasClick)
+            console.debug('result', hasSearch, hasClick)
             new Promise(resolve => {
                 resolve(Runtime.evaluate({expression: 'document.getElementsByTagName(\'html\')[0].outerHTML'}))
-            }).then((result => {
-                // resultPages.push(result.result.value)
-                fs.appendFile('./result.txt', result.result.value + "\r\n", {flag: 'a'}, function (err) {
-                    if (err) {
-                        console.error(err);
-                    } else {
-                        console.log('写入成功');
+            }).then(result => {
+                if (identifyTimes <= 3 && result.result.value.indexOf
+                    ('用户您好，您的访问过于频繁，为确认本次访问为正常用户行为，需要您协助验证。') > -1) {
+                    //验证码处理
+                    if (identifyTimes != 0) {
+                        captcha.reportError(picId);
                     }
+
                     new Promise(resolve => {
-                        resolve(Runtime.evaluate({expression: 'document.getElementById("sogou_next").click()'}))
-                    }).then(data => {
-                        const result = data.result.value
-                        if (result.indexOf('TypeError') > -1)
-                            console.error(result)
+                        resolve(captcha.getCaptchaValue())
+                    }).then(identifyResult => {
+                        picId = identifyResult.pic_id
+                        const submitCaptchaJs = [
+                            'var input = document.querySelector(\'#seccodeInput\')',
+                            'input.value=\'' + identifyResult.pic_str + '\'',
+                            'document.getElementById("submit").click()'
+                        ].join(';')
+                        resolve(Runtime.evaluate({expression: submitCaptchaJs}))
+                        identifyTimes++
                     })
-                });
-            }))
+                } else if (identifyTimes > 3) {
+                    console.error('Captcha identify times already over 3!!!')
+                } else {
+                    //将源码内容放入到数组中
+                    listPageHtmls.push(result.result.value)
+                    new Promise(resolve => {
+                        resolve(Runtime.evaluate({expression: 'document.getElementById(\'sogou_next\').innerHTML'}))
+                    }).then(data => {
+                        const hasNext = data.result.value
+                        if (hasNext.indexOf('下一页') > -1) {
+                            Runtime.evaluate({expression: 'document.getElementById(\'sogou_next\').click()'})
+                            listPageHtmls.push('=====================================')
+                            console.debug('listPageHtmls.length: ' + listPageHtmls.length)
+                        }
+                    }).catch(err => {
+                        console.error('catch error: ' + err)
+                        console.debug('End crawler successfully!')
+                        console.debug('listPageHtmls: ' + listPageHtmls)
+                        protocol.close()
+                        chrome.kill()
+                    })
+                }
+            })
         }
 
         if ((!hasClick) && hasSearch) {
-            console.log('click', hasSearch, hasClick)
+            console.debug('click', hasSearch, hasClick)
             hasClick = true;
             //搜索"一天内"
             // Runtime.evaluate({expression: 'document.getElementsByClassName("time-range")[1].click()'})
@@ -61,18 +96,16 @@ async function execJs() {
         }
 
         if (!hasSearch) {
-            console.log('search', hasSearch, hasClick)
+            console.debug('search', hasSearch, hasClick)
             const js = [
                 'var input = document.querySelector(\'#query\')',
-                'input.value=\'固原\'',
+                'input.value=\'固原 天气\'',
+                // 'input.value=\'' + program.keyword + '\'',
                 'document.getElementsByClassName("swz")[0].click()'
             ].join(';')
             hasSearch = true;
             Runtime.evaluate({expression: js})
-
         }
     });
-}
-
-execJs()
+})()
 
